@@ -46,9 +46,7 @@ def read_transaction_files(txtFilePath):
             dailyTransactions = file.readlines()
         return dailyTransactions
     
-    
-
-#we will process the transactions one by one
+# we will process the transactions one by one
 def process_transaction_line(transaction):
     transactionParts = transaction.strip().split(',')
     if len(transactionParts) != 4:
@@ -67,11 +65,10 @@ def process_transaction_line(transaction):
         products_purchased[int(productId)] = int(quantity)
     
     saleAmount = float(transactionParts[3])
-
     return Transactions(salesStaffId, transactionDate,  transactionHour, products_purchased, saleAmount)
 
 
-'''logic'''
+''' metric calculation logic'''
 def calculate_metrics(transactions: Transactions):
     daily_sales_volume = defaultdict(int)
     daily_sales_value = defaultdict(float)
@@ -80,9 +77,7 @@ def calculate_metrics(transactions: Transactions):
     hour_sales = defaultdict(lambda: defaultdict(int))
     
     for transaction in transactions:
-        
         # Calculate Daily Sales Volume and Value
-       
         daily_sales_volume[transaction.sale_date] += sum(transaction.productsSold.values())
         daily_sales_value[transaction.sale_date] += transaction.saleAmount
         
@@ -90,20 +85,20 @@ def calculate_metrics(transactions: Transactions):
         for productId, quantity in transaction.productsSold.items():
             product_sales[productId] += quantity
         
-        # Calculate Staff Sales (by month)
-        #month =    transactionHour.split('T')[0][:7]
+        # monthly Staff Sales calculation 
         month = transaction.sale_date.month
         #print(month)
         staff_sales[month][transaction.salesStaffId] += transaction.saleAmount
         
-        # Calculate Hour Sales Volume
-        #hour = transactionHour.split('T')[1][:2]
+        # Hourly Sales Volume
         hour = transaction.sale_time
         #./print(hour)
         hour_sales[hour]['volume'] += sum(transaction.productsSold.values())
         hour_sales[hour]['transactions'] += 1
     
     return daily_sales_volume, daily_sales_value, product_sales, staff_sales, hour_sales
+
+'''Display the metrics'''
 
 def report_metrics(daily_sales_volume, daily_sales_value, product_sales, staff_sales, hour_sales):
     # Highest sales volume in a day
@@ -138,26 +133,12 @@ def report_metrics(daily_sales_volume, daily_sales_value, product_sales, staff_s
     print(f"Highest hour of the day by average transaction volume: {highest_avg_hour}")
 
 
-#def create_transaction_objects():
-#    daily_transaction_objs = []
-#    dailyTransactions = read_transaction_files(input("Please input the path to the '.txt' file:"))
-#    
-#    for transaction in dailyTransactions:
-#        daily_transaction_objs.append(process_transaction_line(transaction))
-#    return daily_transaction_objs
-
-#calculate 
+'''----burner code----'''
 
 
 
 print(report_metrics(*calculate_metrics(process_folder())))
 
-#print(process_folder())
-#dailyTransactions = read_transaction_files(input("Please input the path to the '.txt' file:"))
-#
-#for i in dailyTransactions:
-#    print(process_transaction_line(i))
-##print(read_transaction_files("./mp-hackathon-sample-data/test-case-1/2025-01-01.txt"))
-#"./mp-hackathon-sample-data/test-case-1/2025-01-01.txt"
+
 
 
